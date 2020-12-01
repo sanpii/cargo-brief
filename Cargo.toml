@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
 edition = "2018"
 license = "MIT"
+keywords = ["cargo"]
+categories = ["development-tools::cargo-plugins"]
 
 [dependencies]
 ansi_term = "0.12"
