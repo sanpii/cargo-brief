@@ -1,6 +1,7 @@
 # cargo-info
 
 [![Crates.io](https://img.shields.io/crates/v/cargo-info)](https://crates.io/crates/cargo-info)
+[![Build Status](https://gitlab.com/sanpi/cargo-info/badges/master/pipeline.svg)](https://gitlab.com/sanpi/cargo-info/commits/master)
 
 ## Install
 
