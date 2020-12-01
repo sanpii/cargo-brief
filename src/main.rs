@@ -1,10 +1,25 @@
 use structopt::StructOpt;
 
-type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
+type Result<T = ()> = std::result::Result<T, Error>;
+
+#[derive(Debug, thiserror::Error)]
+enum Error {
+    #[error("{0}")]
+    Io(#[from] std::io::Error),
+    #[error("Package {0} not found")]
+    NotFound(String),
+    #[error("Unable to read cargo metadata: {0}")]
+    Metadata(#[from] cargo_metadata::Error),
+    #[error("{0}")]
+    TabWriter(#[from] tabwriter::IntoInnerError<tabwriter::TabWriter<Vec<u8>>>),
+    #[error("{0}")]
+    Utf8(#[from] std::string::FromUtf8Error),
+}
 
 #[derive(StructOpt)]
 struct Opt {
-    dependencies: Vec<String>,
+    #[structopt(default_value = "*")]
+    package: String,
     #[structopt(long, default_value = "./Cargo.toml")]
     manifest_path: String,
     #[structopt(long)]
@@ -17,19 +32,20 @@ fn main() -> Result {
         .manifest_path(&opt.manifest_path)
         .exec()?;
 
+    let wildmatch = wildmatch::WildMatch::new(&opt.package);
     let resolve = metadata.resolve.as_ref().unwrap();
     let packages = dependencies(&metadata, &resolve.root.as_ref().unwrap())
         .unwrap()
         .iter()
         .filter(|x| !opt.no_dev || !dev_only(x))
         .map(|x| package(&metadata, &x.pkg).unwrap())
-        .filter(|x| opt.dependencies.is_empty() || opt.dependencies.contains(&x.name))
+        .filter(|x| wildmatch.is_match(&x.name))
         .collect::<Vec<_>>();
 
-    if !opt.dependencies.is_empty() && packages.len() == 1 {
-        display_one(&packages[0])
-    } else {
-        display_list(&packages)
+    match packages.len() {
+        0 => Err(Error::NotFound(opt.package)),
+        1 => display_one(&packages[0]),
+        _ => display_list(&packages),
     }
 }
 
