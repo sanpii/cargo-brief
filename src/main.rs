@@ -5,6 +5,8 @@ struct Opt {
     dependencies: Vec<String>,
     #[structopt(long, default_value = "./Cargo.toml")]
     manifest_path: String,
+    #[structopt(long)]
+    no_dev: bool,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,10 +20,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut table = tabwriter::TabWriter::new(Vec::new());
 
     let resolve = metadata.resolve.as_ref().unwrap();
-    let dependencies_id = dependencies(&metadata, &resolve.root.as_ref().unwrap()).unwrap();
+    let dependencies = dependencies(&metadata, &resolve.root.as_ref().unwrap()).unwrap();
 
-    for dependency_id in dependencies_id {
-        let package = package(&metadata, &dependency_id).unwrap();
+    for dependency in dependencies {
+        if opt.no_dev && dev_only(&dependency) {
+            continue;
+        }
+
+        let package = package(&metadata, &dependency.pkg).unwrap();
 
         if !opt.dependencies.is_empty() && !opt.dependencies.contains(&package.name) {
             continue;
@@ -45,7 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn dependencies<'a>(
     metadata: &'a cargo_metadata::Metadata,
     id: &cargo_metadata::PackageId,
-) -> Option<&'a Vec<cargo_metadata::PackageId>> {
+) -> Option<&'a Vec<cargo_metadata::NodeDep>> {
     metadata
         .resolve
         .as_ref()
@@ -53,7 +59,7 @@ fn dependencies<'a>(
         .nodes
         .iter()
         .find(|node| &node.id == id)
-        .map(|node| &node.dependencies)
+        .map(|node| &node.deps)
 }
 
 fn package<'a>(
@@ -61,4 +67,10 @@ fn package<'a>(
     id: &cargo_metadata::PackageId,
 ) -> Option<&'a cargo_metadata::Package> {
     metadata.packages.iter().find(|package| &package.id == id)
+}
+
+fn dev_only(dependency: &cargo_metadata::NodeDep) -> bool {
+    dependency.dep_kinds.iter()
+        .map(|x| x.kind)
+        .collect::<Vec<_>>() == vec![cargo_metadata::DependencyKind::Development]
 }
