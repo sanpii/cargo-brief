@@ -19,7 +19,7 @@ enum Error {
 #[derive(StructOpt)]
 #[structopt(name = "cargo", bin_name = "cargo")]
 enum Opt {
-    Info(Info),
+    Brief(Info),
 }
 
 #[derive(StructOpt)]
@@ -33,7 +33,7 @@ struct Info {
 }
 
 fn main() -> Result {
-    let Opt::Info(opt) = Opt::from_args();
+    let Opt::Brief(opt) = Opt::from_args();
     let metadata = cargo_metadata::MetadataCommand::new()
         .manifest_path(&opt.manifest_path)
         .exec()?;
