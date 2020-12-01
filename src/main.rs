@@ -17,7 +17,13 @@ enum Error {
 }
 
 #[derive(StructOpt)]
-struct Opt {
+#[structopt(name = "cargo", bin_name="cargo")]
+enum Opt {
+    Info(Info),
+}
+
+#[derive(StructOpt)]
+struct Info {
     #[structopt(default_value = "*")]
     package: String,
     #[structopt(long, default_value = "./Cargo.toml")]
@@ -27,7 +33,7 @@ struct Opt {
 }
 
 fn main() -> Result {
-    let opt = Opt::from_args();
+    let Opt::Info(opt) = Opt::from_args();
     let metadata = cargo_metadata::MetadataCommand::new()
         .manifest_path(&opt.manifest_path)
         .exec()?;
@@ -64,7 +70,7 @@ fn main() -> Result {
     }
 }
 
-fn member<'a>(opt: &Opt, metadata: &'a cargo_metadata::Metadata, root: &cargo_metadata::PackageId) -> Vec<&'a cargo_metadata::Package> {
+fn member<'a>(opt: &Info, metadata: &'a cargo_metadata::Metadata, root: &cargo_metadata::PackageId) -> Vec<&'a cargo_metadata::Package> {
     let wildmatch = wildmatch::WildMatch::new(&opt.package);
 
     let dependencies = match dependencies(&metadata, &root) {
