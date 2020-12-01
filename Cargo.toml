@@ -5,3 +5,6 @@ authors = ["Sanpi <sanpi@homecomputing.fr>"]
 edition = "2018"
 
 [dependencies]
+cargo_metadata = "0.12"
+structopt = "0.3"
+tabwriter = "1.2"
