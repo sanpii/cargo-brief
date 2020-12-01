@@ -30,6 +30,8 @@ struct Info {
     manifest_path: String,
     #[structopt(long)]
     no_dev: bool,
+    #[structopt(long, short)]
+    recursive: bool,
 }
 
 fn main() -> Result {
@@ -38,8 +40,15 @@ fn main() -> Result {
         .manifest_path(&opt.manifest_path)
         .exec()?;
     let mut total = 0;
+    let root = root(&metadata).map(|x| vec![x.clone()]).unwrap_or_default();
 
-    for workspace_member in &metadata.workspace_members {
+    let members = if opt.recursive {
+        &metadata.workspace_members
+    } else {
+        &root
+    };
+
+    for workspace_member in members {
         let packages = member(&opt, &metadata, &workspace_member);
 
         if packages.is_empty() {
@@ -48,26 +57,30 @@ fn main() -> Result {
 
         total += packages.len();
 
-        if metadata.workspace_members.len() > 1 {
+        if opt.recursive {
             println!("# {}\n", workspace_member);
         }
 
-        if packages.len() > 1 || metadata.workspace_members.len() > 1 {
+        if opt.recursive || packages.len() > 1 {
             display_list(&packages)?;
         } else {
             display_one(&packages[0])?;
         }
 
-        if metadata.workspace_members.len() > 1 {
+        if opt.recursive {
             println!();
         }
     }
 
-    if total == 0 {
+    if total == 0 && opt.package != "*" {
         Err(Error::NotFound(opt.package))
     } else {
         Ok(())
     }
+}
+
+fn root(metadata: &cargo_metadata::Metadata) -> Option<&cargo_metadata::PackageId> {
+    metadata.resolve.as_ref().unwrap().root.as_ref()
 }
 
 fn member<'a>(
