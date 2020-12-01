@@ -17,7 +17,7 @@ enum Error {
 }
 
 #[derive(StructOpt)]
-#[structopt(name = "cargo", bin_name="cargo")]
+#[structopt(name = "cargo", bin_name = "cargo")]
 enum Opt {
     Info(Info),
 }
@@ -70,7 +70,11 @@ fn main() -> Result {
     }
 }
 
-fn member<'a>(opt: &Info, metadata: &'a cargo_metadata::Metadata, root: &cargo_metadata::PackageId) -> Vec<&'a cargo_metadata::Package> {
+fn member<'a>(
+    opt: &Info,
+    metadata: &'a cargo_metadata::Metadata,
+    root: &cargo_metadata::PackageId,
+) -> Vec<&'a cargo_metadata::Package> {
     let wildmatch = wildmatch::WildMatch::new(&opt.package);
 
     let dependencies = match dependencies(&metadata, &root) {
@@ -78,7 +82,8 @@ fn member<'a>(opt: &Info, metadata: &'a cargo_metadata::Metadata, root: &cargo_m
         None => return Vec::new(),
     };
 
-    dependencies.iter()
+    dependencies
+        .iter()
         .filter(|x| !opt.no_dev || !dev_only(x))
         .map(|x| package(&metadata, &x.pkg).unwrap())
         .filter(|x| wildmatch.is_match(&x.name))
@@ -107,9 +112,12 @@ fn package<'a>(
 }
 
 fn dev_only(dependency: &cargo_metadata::NodeDep) -> bool {
-    dependency.dep_kinds.iter()
+    dependency
+        .dep_kinds
+        .iter()
         .map(|x| x.kind)
-        .collect::<Vec<_>>() == vec![cargo_metadata::DependencyKind::Development]
+        .collect::<Vec<_>>()
+        == vec![cargo_metadata::DependencyKind::Development]
 }
 
 fn display_list(packages: &[&cargo_metadata::Package]) -> Result {
@@ -118,7 +126,9 @@ fn display_list(packages: &[&cargo_metadata::Package]) -> Result {
     let mut table = tabwriter::TabWriter::new(Vec::new());
 
     for package in packages {
-        let summary = package.description.as_ref()
+        let summary = package
+            .description
+            .as_ref()
             .map(|x| {
                 let mut lines = x.lines();
                 let line = lines.next().unwrap_or_default();
@@ -131,12 +141,7 @@ fn display_list(packages: &[&cargo_metadata::Package]) -> Result {
             })
             .unwrap_or_default();
 
-        let row = format!(
-            "{}\t{}\t{}\n",
-            package.name,
-            package.version,
-            summary,
-        );
+        let row = format!("{}\t{}\t{}\n", package.name, package.version, summary,);
         table.write_all(row.as_bytes())?;
     }
 
@@ -159,7 +164,11 @@ fn display_one(package: &cargo_metadata::Package) -> Result {
     table.write_all(&row("license", package.license.as_ref()))?;
     table.write_all(&row("homepage", package.homepage.as_ref()))?;
     table.write_all(&row("repository", package.repository.as_ref()))?;
-    let features = package.features.keys().map(|x| x.clone()).collect::<Vec<_>>();
+    let features = package
+        .features
+        .keys()
+        .map(|x| x.clone())
+        .collect::<Vec<_>>();
     table.write_all(&row("features", Some(&features.join(", "))))?;
 
     let s = String::from_utf8(table.into_inner()?)?;
@@ -174,6 +183,6 @@ fn row<S: ToString>(key: &str, value: Option<&S>) -> Vec<u8> {
         ansi_term::Colour::Green.paint(key),
         value.map(|x| x.to_string()).unwrap_or_default(),
     )
-        .as_bytes()
-        .to_vec()
+    .as_bytes()
+    .to_vec()
 }
