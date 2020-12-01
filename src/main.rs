@@ -31,22 +31,52 @@ fn main() -> Result {
     let metadata = cargo_metadata::MetadataCommand::new()
         .manifest_path(&opt.manifest_path)
         .exec()?;
+    let mut total = 0;
 
+    for workspace_member in &metadata.workspace_members {
+        let packages = member(&opt, &metadata, &workspace_member);
+
+        if packages.is_empty() {
+            continue;
+        }
+
+        total += packages.len();
+
+        if metadata.workspace_members.len() > 1 {
+            println!("# {}\n", workspace_member);
+        }
+
+        if packages.len() > 1 || metadata.workspace_members.len() > 1 {
+            display_list(&packages)?;
+        } else {
+            display_one(&packages[0])?;
+        }
+
+        if metadata.workspace_members.len() > 1 {
+            println!("");
+        }
+    }
+
+    if total == 0 {
+        Err(Error::NotFound(opt.package))
+    } else {
+        Ok(())
+    }
+}
+
+fn member<'a>(opt: &Opt, metadata: &'a cargo_metadata::Metadata, root: &cargo_metadata::PackageId) -> Vec<&'a cargo_metadata::Package> {
     let wildmatch = wildmatch::WildMatch::new(&opt.package);
-    let resolve = metadata.resolve.as_ref().unwrap();
-    let packages = dependencies(&metadata, &resolve.root.as_ref().unwrap())
-        .unwrap()
-        .iter()
+
+    let dependencies = match dependencies(&metadata, &root) {
+        Some(dependencies) => dependencies,
+        None => return Vec::new(),
+    };
+
+    dependencies.iter()
         .filter(|x| !opt.no_dev || !dev_only(x))
         .map(|x| package(&metadata, &x.pkg).unwrap())
         .filter(|x| wildmatch.is_match(&x.name))
-        .collect::<Vec<_>>();
-
-    match packages.len() {
-        0 => Err(Error::NotFound(opt.package)),
-        1 => display_one(&packages[0]),
-        _ => display_list(&packages),
-    }
+        .collect::<Vec<_>>()
 }
 
 fn dependencies<'a>(
@@ -82,11 +112,24 @@ fn display_list(packages: &[&cargo_metadata::Package]) -> Result {
     let mut table = tabwriter::TabWriter::new(Vec::new());
 
     for package in packages {
+        let summary = package.description.as_ref()
+            .map(|x| {
+                let mut lines = x.lines();
+                let line = lines.next().unwrap_or_default();
+
+                if lines.count() > 0 {
+                    format!("{}…", line)
+                } else {
+                    line.to_string()
+                }
+            })
+            .unwrap_or_default();
+
         let row = format!(
             "{}\t{}\t{}\n",
             package.name,
             package.version,
-            package.description.as_ref().unwrap_or(&"".to_string())
+            summary,
         );
         table.write_all(row.as_bytes())?;
     }
