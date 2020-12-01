@@ -1,6 +1,7 @@
 # cargo-info
 
 [![Crates.io](https://img.shields.io/crates/v/cargo-info)](https://crates.io/crates/cargo-info)
+[![Github actions](https://github.com/sanpii/cargo-info/workflows/.github/workflows/ci.yml/badge.svg)](https://github.com/sanpii/cargo-info/actions?query=workflow%3A.github%2Fworkflows%2Fci.yml)
 [![Build Status](https://gitlab.com/sanpi/cargo-info/badges/master/pipeline.svg)](https://gitlab.com/sanpi/cargo-info/commits/master)
 
 ## Install
