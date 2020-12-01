@@ -2,6 +2,7 @@ use structopt::StructOpt;
 
 #[derive(StructOpt)]
 struct Opt {
+    dependencies: Vec<String>,
     #[structopt(long, default_value = "./Cargo.toml")]
     manifest_path: String,
 }
@@ -17,10 +18,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut table = tabwriter::TabWriter::new(Vec::new());
 
     let resolve = metadata.resolve.as_ref().unwrap();
-    let dependencies = dependencies(&metadata, &resolve.root.as_ref().unwrap()).unwrap();
+    let dependencies_id = dependencies(&metadata, &resolve.root.as_ref().unwrap()).unwrap();
 
-    for dependency_id in dependencies {
+    for dependency_id in dependencies_id {
         let package = package(&metadata, &dependency_id).unwrap();
+
+        if !opt.dependencies.is_empty() && !opt.dependencies.contains(&package.name) {
+            continue;
+        }
 
         let row = format!(
             "{}\t{}\t{}\n",
