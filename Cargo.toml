@@ -3,6 +3,7 @@ name = "cargo-info"
 version = "0.1.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
 edition = "2018"
+license = "MIT"
 
 [dependencies]
 cargo_metadata = "0.12"
