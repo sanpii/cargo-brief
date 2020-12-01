@@ -59,7 +59,7 @@ fn main() -> Result {
         }
 
         if metadata.workspace_members.len() > 1 {
-            println!("");
+            println!();
         }
     }
 
@@ -164,11 +164,7 @@ fn display_one(package: &cargo_metadata::Package) -> Result {
     table.write_all(&row("license", package.license.as_ref()))?;
     table.write_all(&row("homepage", package.homepage.as_ref()))?;
     table.write_all(&row("repository", package.repository.as_ref()))?;
-    let features = package
-        .features
-        .keys()
-        .map(|x| x.clone())
-        .collect::<Vec<_>>();
+    let features = package.features.keys().cloned().collect::<Vec<_>>();
     table.write_all(&row("features", Some(&features.join(", "))))?;
 
     let s = String::from_utf8(table.into_inner()?)?;
