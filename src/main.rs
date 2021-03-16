@@ -99,7 +99,7 @@ fn member<'a>(
         .iter()
         .filter(|x| !opt.no_dev || !dev_only(x))
         .map(|x| package(&metadata, &x.pkg).unwrap())
-        .filter(|x| wildmatch.is_match(&x.name))
+        .filter(|x| wildmatch.matches(&x.name))
         .collect::<Vec<_>>()
 }
 
