@@ -1,4 +1,4 @@
-use structopt::StructOpt;
+use clap::Parser;
 
 type Result<T = ()> = std::result::Result<T, Error>;
 
@@ -16,26 +16,26 @@ enum Error {
     Utf8(#[from] std::string::FromUtf8Error),
 }
 
-#[derive(StructOpt)]
-#[structopt(name = "cargo", bin_name = "cargo")]
+#[derive(Parser)]
+#[clap(name = "cargo", bin_name = "cargo")]
 enum Opt {
     Brief(Info),
 }
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 struct Info {
-    #[structopt(default_value = "*")]
+    #[clap(default_value = "*")]
     package: String,
-    #[structopt(long, default_value = "./Cargo.toml")]
+    #[clap(long, default_value = "./Cargo.toml")]
     manifest_path: String,
-    #[structopt(long)]
+    #[clap(long)]
     no_dev: bool,
-    #[structopt(long, short)]
+    #[clap(long, short)]
     recursive: bool,
 }
 
 fn main() -> Result {
-    let Opt::Brief(opt) = Opt::from_args();
+    let Opt::Brief(opt) = Opt::parse();
     let metadata = cargo_metadata::MetadataCommand::new()
         .manifest_path(&opt.manifest_path)
         .exec()?;
