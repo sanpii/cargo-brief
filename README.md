@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/cargo-brief)](https://crates.io/crates/cargo-brief)
 [![Github actions](https://github.com/sanpii/cargo-brief/workflows/.github/workflows/ci.yml/badge.svg)](https://github.com/sanpii/cargo-brief/actions?query=workflow%3A.github%2Fworkflows%2Fci.yml)
-[![Build Status](https://gitlab.com/sanpi/cargo-brief/badges/master/pipeline.svg)](https://gitlab.com/sanpi/cargo-brief/commits/master)
+[![Build Status](https://gitlab.com/sanpi/cargo-brief/badges/main/pipeline.svg)](https://gitlab.com/sanpi/cargo-brief/commits/main)
 
 Display a brief summary of cargo dependencies.
 
