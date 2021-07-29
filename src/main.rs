@@ -49,7 +49,7 @@ fn main() -> Result {
     };
 
     for workspace_member in members {
-        let packages = member(&opt, &metadata, &workspace_member);
+        let packages = member(&opt, &metadata, workspace_member);
 
         if packages.is_empty() {
             continue;
@@ -64,7 +64,7 @@ fn main() -> Result {
         if opt.recursive || packages.len() > 1 {
             display_list(&packages)?;
         } else {
-            display_one(&packages[0])?;
+            display_one(packages[0])?;
         }
 
         if opt.recursive {
@@ -90,7 +90,7 @@ fn member<'a>(
 ) -> Vec<&'a cargo_metadata::Package> {
     let wildmatch = wildmatch::WildMatch::new(&opt.package);
 
-    let dependencies = match dependencies(&metadata, &root) {
+    let dependencies = match dependencies(metadata, root) {
         Some(dependencies) => dependencies,
         None => return Vec::new(),
     };
@@ -98,7 +98,7 @@ fn member<'a>(
     dependencies
         .iter()
         .filter(|x| !opt.no_dev || !dev_only(x))
-        .map(|x| package(&metadata, &x.pkg).unwrap())
+        .map(|x| package(metadata, &x.pkg).unwrap())
         .filter(|x| wildmatch.matches(&x.name))
         .collect::<Vec<_>>()
 }
