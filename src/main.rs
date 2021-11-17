@@ -41,8 +41,9 @@ fn main() -> Result {
         .exec()?;
     let mut total = 0;
     let root = root(&metadata).map(|x| vec![x.clone()]).unwrap_or_default();
+    let recursive = opt.recursive || root.is_empty();
 
-    let members = if opt.recursive {
+    let members = if recursive {
         &metadata.workspace_members
     } else {
         &root
@@ -57,17 +58,17 @@ fn main() -> Result {
 
         total += packages.len();
 
-        if opt.recursive {
+        if recursive {
             println!("# {}\n", workspace_member);
         }
 
-        if opt.recursive || packages.len() > 1 {
+        if recursive || packages.len() > 1 {
             display_list(&packages)?;
         } else {
             display_one(packages[0])?;
         }
 
-        if opt.recursive {
+        if recursive {
             println!();
         }
     }
