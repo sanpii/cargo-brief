@@ -17,20 +17,20 @@ enum Error {
 }
 
 #[derive(Parser)]
-#[clap(name = "cargo", bin_name = "cargo")]
+#[command(name = "cargo", bin_name = "cargo")]
 enum Opt {
     Brief(Info),
 }
 
 #[derive(Parser)]
 struct Info {
-    #[clap(default_value = "*")]
+    #[arg(default_value = "*")]
     package: String,
-    #[clap(long, default_value = "./Cargo.toml")]
+    #[arg(long, default_value = "./Cargo.toml")]
     manifest_path: String,
-    #[clap(long)]
+    #[arg(long)]
     no_dev: bool,
-    #[clap(long, short)]
+    #[arg(long, short)]
     recursive: bool,
 }
 
