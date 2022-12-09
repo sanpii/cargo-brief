@@ -27,7 +27,7 @@ struct Info {
     #[arg(default_value = "*")]
     package: String,
     #[arg(long, default_value = "./Cargo.toml")]
-    manifest_path: String,
+    manifest_path: std::path::PathBuf,
     #[arg(long)]
     no_dev: bool,
     #[arg(long, short)]
