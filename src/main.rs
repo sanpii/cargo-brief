@@ -1,3 +1,5 @@
+#![warn(warnings)]
+
 use clap::Parser;
 
 type Result<T = ()> = std::result::Result<T, Error>;
