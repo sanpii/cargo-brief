@@ -59,7 +59,7 @@ fn main() -> Result {
         total += packages.len();
 
         if recursive {
-            println!("# {}\n", workspace_member);
+            println!("# {workspace_member}\n");
         }
 
         if recursive || packages.len() > 1 {
@@ -148,7 +148,7 @@ fn display_list(packages: &[&cargo_metadata::Package]) -> Result {
                 let line = lines.next().unwrap_or_default();
 
                 if lines.count() > 0 {
-                    format!("{}…", line)
+                    format!("{line}…")
                 } else {
                     line.to_string()
                 }
@@ -160,7 +160,7 @@ fn display_list(packages: &[&cargo_metadata::Package]) -> Result {
     }
 
     let s = String::from_utf8(table.into_inner()?)?;
-    print!("{}", s);
+    print!("{s}");
 
     Ok(())
 }
@@ -182,7 +182,7 @@ fn display_one(package: &cargo_metadata::Package) -> Result {
     table.write_all(&row("features", Some(&features.join(", "))))?;
 
     let s = String::from_utf8(table.into_inner()?)?;
-    print!("{}", s);
+    print!("{s}");
 
     Ok(())
 }
