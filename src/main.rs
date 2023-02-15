@@ -192,7 +192,7 @@ fn row<S: ToString>(key: &str, value: Option<&S>) -> Vec<u8> {
     format!(
         "{}\t: {}\n",
         ansi_term::Colour::Green.paint(key),
-        value.map(|x| x.to_string()).unwrap_or_default(),
+        value.map(ToString::to_string).unwrap_or_default(),
     )
     .as_bytes()
     .to_vec()
