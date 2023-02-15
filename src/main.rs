@@ -93,9 +93,8 @@ fn member<'a>(
 ) -> Vec<&'a cargo_metadata::Package> {
     let wildmatch = wildmatch::WildMatch::new(&opt.package);
 
-    let dependencies = match dependencies(metadata, root) {
-        Some(dependencies) => dependencies,
-        None => return Vec::new(),
+    let Some(dependencies) = dependencies(metadata, root) else {
+        return Vec::new();
     };
 
     dependencies
