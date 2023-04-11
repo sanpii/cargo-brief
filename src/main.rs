@@ -191,7 +191,7 @@ fn display_one(package: &cargo_metadata::Package) -> Result {
 fn row<S: ToString>(key: &str, value: Option<&S>) -> Vec<u8> {
     format!(
         "{}\t: {}\n",
-        ansi_term::Colour::Green.paint(key),
+        nu_ansi_term::Color::Green.paint(key),
         value.map(ToString::to_string).unwrap_or_default(),
     )
     .as_bytes()
