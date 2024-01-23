@@ -10,7 +10,7 @@ categories = ["development-tools::cargo-plugins"]
 repository = "https://github.com/sanpii/cargo-brief"
 
 [dependencies]
-nu-ansi-term = "0.49"
+nu-ansi-term = "0.50"
 cargo_metadata = "0.18"
 tabwriter = "1.2"
 thiserror = "1.0"
