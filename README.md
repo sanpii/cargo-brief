@@ -6,6 +6,9 @@
 
 Display a brief summary of cargo dependencies.
 
+> [!WARNING]
+> This plugin is unmaintened, use `cargo info` instead
+
 ## Install
 
 ```
